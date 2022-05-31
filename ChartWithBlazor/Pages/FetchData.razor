@@ -1,0 +1,105 @@
+﻿@page "/fetchdata"
+@inject IJSRuntime JSRuntime
+@using MathNet.Numerics.Statistics
+
+<PageTitle>Weather forecast</PageTitle>
+
+@using ChartWithBlazor.Data
+@inject DataProvider ForecastService
+
+<h1>DatasauRus</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div>
+                @if (forecasts != null)
+                {
+                    <ul>
+                        @foreach (var set in sets)
+                        {
+                            <li @onclick="async () => await SetDataset(set)">@set</li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+        <div class="col-9">
+            <div id="chart_div" style="width: 900px; height: 500px;"></div>
+        </div>
+    </div>
+
+    <div class="sol-12">
+        <h3>X statistics</h3>
+        <p>
+            @desx
+        </p>
+
+        <h3>Y satistics</h3>
+        <p>
+            @desy
+        </p>
+    </div>
+</div>
+
+
+@code {
+    private Data[]? forecasts;
+    private string[] sets = new string[0];
+    private string? selectedDataset;
+    private string? desx;
+    private string? desy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await ForecastService.GetDataAsync();
+
+        sets = forecasts.Select(d => d.Name).Distinct().ToArray();
+
+        if (selectedDataset == null)
+        {
+            selectedDataset = sets[0];
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        await SetDataset();
+    }
+
+    private async Task SetDataset(string? name = null)
+    {
+        if (forecasts == null)
+        {
+            throw new InvalidOperationException($"{nameof(forecasts)} cannot be null here");
+        }
+
+        if (name != null)
+        {
+            selectedDataset = name;
+        }
+
+        if (selectedDataset == null)
+        {
+            selectedDataset = sets[0];
+        }
+
+        var dataSelected = forecasts.Where(f => f.Name == selectedDataset);
+
+        var xs = dataSelected.Select(f => f.X).ToArray();
+
+        var ys = dataSelected.Select(f => f.Y).ToArray();
+
+        await JSRuntime.InvokeVoidAsync("loadChart",
+            selectedDataset,
+            xs,
+            ys);
+
+        desx = $"Moyenne: {ArrayStatistics.Mean(xs)} EcartType: {ArrayStatistics.StandardDeviation(xs)}";
+        desy = $"Moyenne: {ArrayStatistics.Mean(ys)} EcartType: {ArrayStatistics.StandardDeviation(ys)}";
+
+        StateHasChanged();
+    }
+}

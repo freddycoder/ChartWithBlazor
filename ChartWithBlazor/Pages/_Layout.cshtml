@@ -1,0 +1,69 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@namespace ChartWithBlazor.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link href="css/site.css" rel="stylesheet" />
+    <link href="ChartWithBlazor.styles.css" rel="stylesheet" />
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        window.loadChart = (chartTitle, xs, ys) => {
+
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(drawChart);
+
+            var array = [
+                ['X', 'Y']
+            ];
+
+            for (var i = 0; i < xs.length; i++) 
+            {
+                var ap = [xs[i], ys[i]];
+
+                array.push(ap);
+            }
+
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable(array);
+
+                var options = {
+                    title: chartTitle,
+                    hAxis: { title: 'X', minValue: 0, maxValue: 100 },
+                    vAxis: { title: 'Y', minValue: 0, maxValue: 100 },
+                    legend: 'none'
+                };
+
+                var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+
+                chart.draw(data, options);
+            }
+
+
+        };
+    </script>
+
+</head>
+<body>
+    @RenderBody()
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+</body>
+</html>
