@@ -1,6 +1,6 @@
 # ChartWithBlazor
 
-![Example page](https://github.com/freddycoder/ChartWithBlazor/blob/master/demo.png?raw=true)
+![Example page](https://github.com/freddycoder/ChartWithBlazor/blob/main/demo.png?raw=true)
 
 The graph is rendered using google charts.
 
