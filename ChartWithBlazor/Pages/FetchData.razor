@@ -18,27 +18,26 @@
                     <ul>
                         @foreach (var set in sets)
                         {
-                            <li @onclick="async () => await SetDataset(set)">@set</li>
+                            <li style="cursor: pointer; @(set == selectedDataset ? "color: blue;" : "")" @onclick="async () => await SetDataset(set)">@set</li>
                         }
                     </ul>
                 }
             </div>
         </div>
-        <div class="col-9">
+        <div class="col-md-9">
             <div id="chart_div" style="width: 900px; height: 500px;"></div>
         </div>
-    </div>
+        <div class="col-md-3">
+            <h4>X statistics</h4>
+            <p>
+                @desx
+            </p>
 
-    <div class="sol-12">
-        <h3>X statistics</h3>
-        <p>
-            @desx
-        </p>
-
-        <h3>Y satistics</h3>
-        <p>
-            @desy
-        </p>
+            <h4>Y satistics</h4>
+            <p>
+                @desy
+            </p>
+        </div>
     </div>
 </div>
 
@@ -97,9 +96,12 @@
             xs,
             ys);
 
-        desx = $"Moyenne: {ArrayStatistics.Mean(xs)} EcartType: {ArrayStatistics.StandardDeviation(xs)}";
-        desy = $"Moyenne: {ArrayStatistics.Mean(ys)} EcartType: {ArrayStatistics.StandardDeviation(ys)}";
+        desx = $"x̄: {ArrayStatistics.Mean(xs).ToString("F2")} SD: {ArrayStatistics.StandardDeviation(xs).ToString("F2")}";
+        desy = $"x̄: {ArrayStatistics.Mean(ys).ToString("F2")} SD: {ArrayStatistics.StandardDeviation(ys).ToString("F2")}";
 
-        StateHasChanged();
+        if (name != null)
+        {
+            StateHasChanged();
+        }
     }
 }
